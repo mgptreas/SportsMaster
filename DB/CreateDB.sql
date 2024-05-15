@@ -4,6 +4,8 @@ DROP TABLE IF EXISTS UserAuth;
 DROP TABLE IF EXISTS Exercises;
 DROP TABLE IF EXISTS Sports;
 DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Analytical;
+DROP TABLE IF EXISTS Aggregated;
 
 -- Users table
 CREATE TABLE Users (
@@ -13,7 +15,8 @@ CREATE TABLE Users (
     email VARCHAR(255),
     Height FLOAT,
     Weight FLOAT,
-    Points INTEGER
+    Points INTEGER,
+    premium BOOLEAN DEFAULT FALSE
 );
 
 -- UserAuth table
@@ -55,6 +58,33 @@ CREATE TABLE Unlocked (
     PRIMARY KEY (uID, eID)
 );
 
+-- Analytical table
+CREATE TABLE Analytical (
+    InstanceID SERIAL PRIMARY KEY,
+    uID INTEGER REFERENCES Users(uID),
+    eID INTEGER REFERENCES Exercises(eID),
+    timestamp VARCHAR(255),
+    toc INTEGER,
+    challenging INTEGER,
+    feedback INTEGER
+);
+
+-- Create Aggregated table
+CREATE TABLE Aggregated (
+    uID INTEGER,
+    eID INTEGER,
+    count INTEGER,
+    avgTOC FLOAT,
+    avgChallenging FLOAT,
+    avgFeedback FLOAT,
+    commonness INTEGER,
+    rarity INTEGER,
+    PRIMARY KEY (uID, eID),
+    CONSTRAINT fk_Aggregated_uID FOREIGN KEY (uID) REFERENCES Users(uID),
+    CONSTRAINT fk_Aggregated_eID FOREIGN KEY (eID) REFERENCES Exercises(eID)
+);
+
+
 
 -- Add constraints
 ALTER TABLE UserAuth
@@ -76,4 +106,3 @@ ALTER TABLE Exercises
 ADD CONSTRAINT fk_Exercises_sID
 FOREIGN KEY (sID)
 REFERENCES Sports(sID);
-

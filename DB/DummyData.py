@@ -1,114 +1,88 @@
-#NEEDS FIXING, HAVEN'T EXECUTED YET
-
-
-
 import psycopg2
-from faker import Faker
 import random
+from datetime import datetime
 
-# Connect to the PostgreSQL database
+
+
+# Connect to your PostgreSQL database through SSH tunnel
 conn = psycopg2.connect(
-    dbname="your_database_name",
-    user="your_username",
-    password="your_password",
-    host="your_host",
-    port="your_port"
+    dbname="SportsMasterDB",
+    user="SMDBadmin",
+    password="!Qo82oo2",
+    host="localhost",
+    port=5432
 )
 
 # Create a cursor object
 cur = conn.cursor()
 
-# Initialize Faker to generate dummy data
-fake = Faker()
+# Dummy data for Users
+users_data = [
+    ("user1", "User One", "user1@example.com", 175, 70, 100, False),
+    ("user2", "User Two", "user2@example.com", 180, 75, 150, True),
+    ("user3", "User Three", "user3@example.com", 170, 65, 200, False)
+]
 
-# Function to generate dummy data for Users table
-def generate_users_data(num_records):
-    users_data = []
-    for _ in range(num_records):
-        username = fake.user_name()
-        name = fake.name()
-        email = fake.email()
-        height = random.uniform(150, 200)  # Random height between 150 and 200 cm
-        weight = random.uniform(50, 100)   # Random weight between 50 and 100 kg
-        points = random.randint(0, 1000)   # Random points
-        users_data.append((username, name, email, height, weight, points))
-    return users_data
+# Insert Users data into Users table
+for user in users_data:
+    cur.execute('INSERT INTO USERS (username, name, email, Height, Weight, Points, premium) VALUES (%s, %s, %s, %s, %s, %s, %s)', user)
 
-# Function to generate dummy data for Unlocked table
-def generate_unlocked_data(num_records, num_users, num_exercises):
-    unlocked_data = []
-    for _ in range(num_records):
-        uID = random.randint(1, num_users)
-        eID = random.randint(1, num_exercises)
-        unlocked_data.append((uID, eID))
-    return unlocked_data
+# Dummy data for Sports
+sports_data = [
+    ("Sport A", "Field A1", "Field A2", "Field A3", "Field A4", "Field A5"),
+    ("Sport B", "Field B1", "Field B2", "Field B3", "Field B4", "Field B5"),
+    ("Sport C", "Field C1", "Field C2", "Field C3", "Field C4", "Field C5")
+]
 
-# Function to generate dummy data for UserAuth table
-def generate_userauth_data(users_data):
-    userauth_data = [(uID, data[0], "password123") for uID, data in enumerate(users_data, start=1)]
-    return userauth_data
+# Insert Sports data into Sports table
+for sport in sports_data:
+    cur.execute("INSERT INTO Sports (name, field1, field2, field3, field4, field5) VALUES (%s, %s, %s, %s, %s, %s)", sport)
 
-# Function to generate dummy data for Exercises table
-def generate_exercises_data(num_records, num_sports):
-    exercises_data = []
-    for _ in range(num_records):
-        sID = random.randint(1, num_sports)
-        description = fake.text()
-        video_url = fake.url()
-        difficulty = random.choice(['easy', 'medium', 'hard'])
-        exercises_data.append((sID, description, video_url, difficulty))
-    return exercises_data
+# Dummy data for Exercises
+exercises_data = []
+for i in range(50):  # Assuming you want 50 exercises
+    exercise = (
+        random.randint(1, 3),  # Randomly choose a sport ID
+        f"Exercise {i+1} description",
+        f"https://example.com/exercise_{i+1}.mp4",
+        random.randint(1, 5),  # Random difficulty level
+        random.randint(0, 10),  # Field1
+        random.randint(0, 10),  # Field2
+        random.randint(0, 10),  # Field3
+        random.randint(0, 10),  # Field4
+        random.randint(0, 10)   # Field5
+    )
+    exercises_data.append(exercise)
 
-# Function to generate dummy data for Sports table
-def generate_sports_data(num_records):
-    sports_data = []
-    for _ in range(num_records):
-        name = fake.word()
-        sports_data.append((name,))
-    return sports_data
+# Insert Exercises data into Exercises table
+for exercise in exercises_data:
+    cur.execute("INSERT INTO Exercises (sID, description, video, difficulty, field1, field2, field3, field4, field5) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", exercise)
 
-# Generate dummy data
-num_users = 100
-num_exercises = 200
-num_sports = 10
+# Dummy data for Unlocked (assuming each user unlocked all exercises)
+for user_id in range(1, 4):  # Assuming you have 3 users
+    for exercise_id in range(1, 51):  # Assuming you have 50 exercises
+        unlocked_data = (user_id, exercise_id)
+        cur.execute("INSERT INTO Unlocked (uID, eID) VALUES (%s, %s)", unlocked_data)
 
-users_data = generate_users_data(num_users)
-unlocked_data = generate_unlocked_data(num_users * 10, num_users, num_exercises)
-userauth_data = generate_userauth_data(users_data)
-exercises_data = generate_exercises_data(num_exercises, num_sports)
-sports_data = generate_sports_data(num_sports)
+# Dummy data for Analytical
+for user_id in range(1, 4):  # Assuming you have 3 users
+    for exercise_id in range(1, 51):  # Assuming you have 50 exercises
+        for _ in range(random.randint(1, 5)):  # Random number of instances per exercise
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            analytical_data = (
+                user_id,
+                exercise_id,
+                timestamp,
+                random.randint(0, 10),  # TOC
+                random.randint(1, 10),  # Challenging
+                random.randint(1, 10)   # Feedback
+            )
+            cur.execute("INSERT INTO Analytical (uID, eID, timestamp, toc, challenging, feedback) VALUES (%s, %s, %s, %s, %s, %s)", analytical_data)
 
-# Insert dummy data into the database
-cur.executemany("""
-    INSERT INTO Users (username, name, email, Height, Weight, Points)
-    VALUES (%s, %s, %s, %s, %s, %s)
-""", users_data)
-
-cur.executemany("""
-    INSERT INTO Unlocked (uID, eID)
-    VALUES (%s, %s)
-""", unlocked_data)
-
-cur.executemany("""
-    INSERT INTO UserAuth (uID, username, password)
-    VALUES (%s, %s, %s)
-""", userauth_data)
-
-cur.executemany("""
-    INSERT INTO Exercises (sID, description, video_url, difficulty)
-    VALUES (%s, %s, %s, %s)
-""", exercises_data)
-
-cur.executemany("""
-    INSERT INTO Sports (name)
-    VALUES (%s)
-""", sports_data)
-
-# Commit the transaction
+# Commit changes
 conn.commit()
 
-# Close the cursor and connection
+
+# Close cursor and connection to PostgreSQL database
 cur.close()
 conn.close()
-
-print("Dummy data insertion complete.")
