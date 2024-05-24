@@ -73,12 +73,12 @@ CREATE TABLE Analytical (
 CREATE TABLE Aggregated (
     uID INTEGER,
     eID INTEGER,
-    count INTEGER,
     avgTOC FLOAT,
     avgChallenging FLOAT,
     avgFeedback FLOAT,
     commonness INTEGER,
     rarity INTEGER,
+    CoT INTEGER,
     PRIMARY KEY (uID, eID),
     CONSTRAINT fk_Aggregated_uID FOREIGN KEY (uID) REFERENCES Users(uID),
     CONSTRAINT fk_Aggregated_eID FOREIGN KEY (eID) REFERENCES Exercises(eID)
