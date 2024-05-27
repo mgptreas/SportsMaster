@@ -1,0 +1,13 @@
+SSH into EC2: 
+ssh -i "A:\AUEB\AEPS\SMKey.pem" -L 5432:sportsmasterdb.cf6qwyuwgxvx.eu-central-1.rds.amazonaws.com:5432 Administrator@3.71.21.250
+
+Run django developement server:
+python manage.py runserver
+
+Django server migrations
+python manage.py makemigrations
+python manage.py migrate
+python manage.py showmigrations
+
+Django Shell
+python manage.py shell
