@@ -2,8 +2,6 @@ import psycopg2
 import random
 from datetime import datetime
 
-
-
 # Connect to your PostgreSQL database through SSH tunnel
 conn = psycopg2.connect(
     dbname="SportsMasterDB",
@@ -25,7 +23,17 @@ users_data = [
 
 # Insert Users data into Users table
 for user in users_data:
-    cur.execute('INSERT INTO USERS (username, name, email, Height, Weight, Points, premium) VALUES (%s, %s, %s, %s, %s, %s, %s)', user)
+    cur.execute(
+        'INSERT INTO "Users" (username, name, email, height, weight, points, premium) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+        user
+    )
+
+# Fetch the IDs of the inserted users to ensure they match the expected IDs
+cur.execute('SELECT "uID" FROM "Users"')
+user_ids = [row[0] for row in cur.fetchall()]
+if len(user_ids) < 3:
+    print("Error: Not enough users inserted into the database.")
+    exit(1)
 
 # Dummy data for Sports
 sports_data = [
@@ -36,13 +44,23 @@ sports_data = [
 
 # Insert Sports data into Sports table
 for sport in sports_data:
-    cur.execute("INSERT INTO Sports (name, field1, field2, field3, field4, field5) VALUES (%s, %s, %s, %s, %s, %s)", sport)
+    cur.execute(
+        'INSERT INTO "Sports" (name, field1, field2, field3, field4, field5) VALUES (%s, %s, %s, %s, %s, %s)',
+        sport
+    )
+
+# Fetch the IDs of the inserted sports to ensure they match the expected IDs
+cur.execute('SELECT "sID" FROM "Sports"')
+sports_ids = [row[0] for row in cur.fetchall()]
+if len(sports_ids) < 3:
+    print("Error: Not enough sports inserted into the database.")
+    exit(1)
 
 # Dummy data for Exercises
 exercises_data = []
 for i in range(50):  # Assuming you want 50 exercises
     exercise = (
-        random.randint(1, 3),  # Randomly choose a sport ID
+        random.choice(sports_ids),  # Randomly choose a sport ID from inserted sports
         f"Exercise {i+1} description",
         f"https://example.com/exercise_{i+1}.mp4",
         random.randint(1, 5),  # Random difficulty level
@@ -56,17 +74,30 @@ for i in range(50):  # Assuming you want 50 exercises
 
 # Insert Exercises data into Exercises table
 for exercise in exercises_data:
-    cur.execute("INSERT INTO Exercises (sID, description, video, difficulty, field1, field2, field3, field4, field5) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", exercise)
+    cur.execute(
+        'INSERT INTO "Exercises" ("sID", description, video, difficulty, field1, field2, field3, field4, field5) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
+        exercise
+    )
+
+# Fetch the IDs of the inserted exercises to ensure they match the expected IDs
+cur.execute('SELECT "eID" FROM "Exercises"')
+exercise_ids = [row[0] for row in cur.fetchall()]
+if len(exercise_ids) < 50:
+    print("Error: Not enough exercises inserted into the database.")
+    exit(1)
 
 # Dummy data for Unlocked (assuming each user unlocked all exercises)
-for user_id in range(1, 4):  # Assuming you have 3 users
-    for exercise_id in range(1, 51):  # Assuming you have 50 exercises
+for user_id in user_ids:  # Using the actual inserted user IDs
+    for exercise_id in exercise_ids:  # Using the actual inserted exercise IDs
         unlocked_data = (user_id, exercise_id)
-        cur.execute("INSERT INTO Unlocked (uID, eID) VALUES (%s, %s)", unlocked_data)
+        cur.execute(
+            'INSERT INTO "Unlocked" ("uID", "eID") VALUES (%s, %s)',
+            unlocked_data
+        )
 
 # Dummy data for Analytical
-for user_id in range(1, 4):  # Assuming you have 3 users
-    for exercise_id in range(1, 51):  # Assuming you have 50 exercises
+for user_id in user_ids:  # Using the actual inserted user IDs
+    for exercise_id in exercise_ids:  # Using the actual inserted exercise IDs
         for _ in range(random.randint(1, 5)):  # Random number of instances per exercise
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             analytical_data = (
@@ -77,11 +108,13 @@ for user_id in range(1, 4):  # Assuming you have 3 users
                 random.randint(1, 10),  # Challenging
                 random.randint(1, 10)   # Feedback
             )
-            cur.execute("INSERT INTO Analytical (uID, eID, timestamp, toc, challenging, feedback) VALUES (%s, %s, %s, %s, %s, %s)", analytical_data)
+            cur.execute(
+                'INSERT INTO "Analytical" ("uID", "eID", timestamp, toc, challenging, feedback) VALUES (%s, %s, %s, %s, %s, %s)',
+                analytical_data
+            )
 
 # Commit changes
 conn.commit()
-
 
 # Close cursor and connection to PostgreSQL database
 cur.close()

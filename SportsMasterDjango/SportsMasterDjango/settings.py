@@ -77,11 +77,12 @@ WSGI_APPLICATION = 'SportsMasterDjango.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'SportsMasterDB',
         'USER': 'SMDBadmin',
         'PASSWORD': '!Qo82oo2',
         'HOST': 'localhost',
+        #'HOST': 'sportsmasterdb.cf6qwyuwgxvx.eu-central-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
