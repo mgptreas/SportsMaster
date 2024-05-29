@@ -1,0 +1,57 @@
+Step-by-Step Recap
+Initial Setup and Table Creation:
+
+We began by setting up Django models that matched the desired table structure for our PostgreSQL database.
+The Django models included the following tables: Users, UserAuth, Sports, Exercises, Unlocked, Analytical, and Aggregated.
+Adjusting Models to Match SQL Schema:
+
+We adjusted the Django models to ensure that the table and column names matched the SQL schema provided, specifically handling primary keys and foreign key constraints.
+Changes included:
+Adding primary keys explicitly where needed.
+Ensuring foreign keys matched the correct column names in referenced tables.
+Aligning field names with the SQL schema (e.g., using uID instead of id).
+SQL Table Creation Script:
+
+We provided an SQL script to create the tables in PostgreSQL, ensuring it matched the structure defined by the Django models.
+This script handled the creation of tables with the appropriate primary keys and foreign key constraints.
+Populating Tables with Dummy Data:
+
+We wrote a Python script using psycopg2 to connect to the PostgreSQL database and populate it with dummy data.
+This script included dummy data for all tables and handled inserting records while respecting foreign key constraints.
+Key points in the script included:
+Inserting data into Users and fetching uID values.
+Inserting data into Sports and fetching sID values.
+Inserting data into Exercises using sID values.
+Inserting data into Unlocked using uID and eID values.
+Inserting data into Analytical using uID and eID values.
+Handling Foreign Key Constraints:
+
+During the insertion of data, we ensured that foreign key constraints were respected by:
+Fetching primary key values (e.g., uID, sID, eID) from previously inserted records.
+Using these fetched values for subsequent inserts to maintain referential integrity.
+Summary of the Database Schema:
+Users Table:
+
+uID (Primary Key), username, name, email, height, weight, points, premium
+UserAuth Table:
+
+uID (Primary Key, Foreign Key to Users), username, password
+Sports Table:
+
+sID (Primary Key), name, field1, field2, field3, field4, field5
+Exercises Table:
+
+eID (Primary Key), sID (Foreign Key to Sports), description, video, difficulty, field1, field2, field3, field4, field5
+Unlocked Table:
+
+uID (Foreign Key to Users), eID (Foreign Key to Exercises), Primary Key (uID, eID)
+Analytical Table:
+
+InstanceID (Primary Key), uID (Foreign Key to Users), eID (Foreign Key to Exercises), timestamp, toc, challenging, feedback
+Aggregated Table:
+
+uID (Foreign Key to Users), eID (Foreign Key to Exercises), avgTOC, avgChallenging, avgFeedback, commonness, rarity, CoT, Primary Key (uID, eID)
+Python Script to Populate Tables:
+The script connects to the PostgreSQL database and inserts dummy data, ensuring referential integrity by correctly handling foreign key values.
+Conclusion:
+At this point, Django is set up, the database schema is correctly defined, and the tables are populated with dummy data. You can now proceed to the next steps in your project with a properly initialized database.

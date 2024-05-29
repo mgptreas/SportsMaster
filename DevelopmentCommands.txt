@@ -14,7 +14,12 @@ python manage.py shell
 
 Curl testing commands:
 curl -X GET "http://127.0.0.1:8000/api/get_all_users/"
-# Test with a username that does not exist
-curl -X GET "http://127.0.0.1:8000/api/check_user/?username=testuser"
-# Test with a username that exists
-curl -X GET "http://127.0.0.1:8000/api/check_user/?username=user1"
+
+#Register existing user
+curl -X POST "http://127.0.0.1:8000/api/register_user/" -H "Content-Type: application/json" -d "{\"username\": \"user1\", \"password\": \"password123\", \"email\": \"user1@example.com\", \"name\": \"User One\", \"height\": 175, \"weight\": 70}"
+
+#Register new user
+curl -X POST "http://127.0.0.1:8000/api/register_user/" -H "Content-Type: application/json" -d "{\"username\": \"newuser\", \"password\": \"password123\", \"email\": \"newuser@example.com\", \"name\": \"New User\", \"height\": 180, \"weight\": 75}"
+
+#Login created user
+curl -X GET "http://127.0.0.1:8000/api/login_user/?username=newuser&password=password123"
