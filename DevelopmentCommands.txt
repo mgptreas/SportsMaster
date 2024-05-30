@@ -22,4 +22,6 @@ curl -X POST "http://127.0.0.1:8000/api/register_user/" -H "Content-Type: applic
 curl -X POST "http://127.0.0.1:8000/api/register_user/" -H "Content-Type: application/json" -d "{\"username\": \"newuser\", \"password\": \"password123\", \"email\": \"newuser@example.com\", \"name\": \"New User\", \"height\": 180, \"weight\": 75}"
 
 #Login created user
+#Wrong username: curl -X GET "http://127.0.0.1:8000/api/login_user/?username=random&password=password123"
+#Wrong password: curl -X GET "http://127.0.0.1:8000/api/login_user/?username=newuser&password=password"
 curl -X GET "http://127.0.0.1:8000/api/login_user/?username=newuser&password=password123"
