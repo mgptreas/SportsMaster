@@ -1,11 +1,14 @@
+import random
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Users, UserAuth
-from .serializers import UserSerializer, UserAuthSerializer
+from .models import *
+from .serializers import *
 
 
+
+################################################ REGISTER/LOGIN USER #####################################################
 #Get all users
 @api_view(['GET'])
 def get_all_users(request):
@@ -88,3 +91,164 @@ def login_user(request):
         return Response(user_data, status=status.HTTP_200_OK)
     except UserAuth.DoesNotExist:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+
+####################################### SELECT EXERCISES FOR WORKOUT ##################################################
+
+@api_view(['GET'])
+def select_workout(request):
+    user_id = request.query_params.get('uID')
+    sport_name = request.query_params.get('sport_name')
+    selected_fields = request.query_params.get('fields')
+    available_time = request.query_params.get('time')
+
+    print(f"Received parameters - user_id: {user_id}, sport_name: {sport_name}, selected_fields: {selected_fields}, available_time: {available_time}")
+
+    if not (user_id and sport_name and selected_fields and available_time):
+        return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    selected_fields = selected_fields.split(',')
+    print(f"Split selected_fields: {selected_fields}")
+    
+    available_time = int(available_time)
+
+    try:
+        sport = Sports.objects.get(name=sport_name)
+        print(f"Found sport: {sport}")
+    except Sports.DoesNotExist:
+        return Response({"error": "Sport not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    field_map = {
+        sport.field1: 1,
+        sport.field2: 2,
+        sport.field3: 3,
+        sport.field4: 4,
+        sport.field5: 5
+    }
+    print(f"Field map: {field_map}")
+
+    try:
+        selected_field_indices = [field_map[field] for field in selected_fields]
+        print(f"Selected field indices: {selected_field_indices}")
+    except KeyError as e:
+        return Response({"error": f"Field '{str(e)}' not found for the selected sport"}, status=status.HTTP_404_NOT_FOUND)
+
+    selected_exercises = select_exercises(user_id, sport.sID, selected_field_indices, available_time)
+    print(f"Selected exercises: {selected_exercises}")
+    return Response(selected_exercises, status=status.HTTP_200_OK)
+
+def select_exercises(user_id, sport_id, selected_fields, available_time):
+    exercises = fetch_unlocked_exercises(user_id, sport_id)
+    print(f"Fetched exercises: {exercises}")
+    aggregated_data = {agg.eID: agg for agg in Aggregated.objects.filter(uID=user_id)}
+    print(f"Aggregated data: {aggregated_data}")
+    sorted_exercises = sort_exercises(exercises, selected_fields, aggregated_data)
+    print(f"Sorted exercises: {sorted_exercises}")
+    
+    selected_exercises = []
+    total_time = 0
+    
+    for exercise, score in sorted_exercises:
+        avgTOC = aggregated_data.get(exercise.eID, {}).get('avgTOC', 5)  # Default to 5 minutes if avgTOC is not available
+        if total_time + avgTOC <= available_time:
+            selected_exercises.append({
+                "eID": exercise.eID,
+                "description": exercise.description,
+                "avgTOC": avgTOC,
+                "score": score
+            })
+            total_time += avgTOC
+    
+    print(f"Final selected exercises: {selected_exercises}")
+    return selected_exercises
+
+def fetch_unlocked_exercises(user_id, sport_id):
+    unlocked_exercises = Unlocked.objects.filter(uID=user_id).values_list('eID', flat=True)
+    exercises = Exercises.objects.filter(eID__in=unlocked_exercises, sID=sport_id)
+    print(f"Fetched unlocked exercises: {exercises}")
+    return exercises
+
+def sort_exercises(exercises, selected_fields, aggregated_data):
+    exercise_scores = []
+    for exercise in exercises:
+        score = calculate_exercise_score(exercise, selected_fields, aggregated_data)
+        exercise_scores.append((exercise, score))
+    
+    sorted_exercises = sorted(exercise_scores, key=lambda x: x[1], reverse=True)
+    print(f"Exercise scores: {exercise_scores}")
+    return sorted_exercises
+
+def calculate_exercise_score(exercise, selected_fields, aggregated_data):
+    weights = [10 if i + 1 in selected_fields else 1 for i in range(5)]
+    field_scores = sum([getattr(exercise, f'field{i+1}') * weights[i] for i in range(5)])
+    
+    main_field_index = selected_fields[0] - 1
+    if getattr(exercise, f'field{selected_fields[0]}') == 0:
+        print(f"Main field is 0 for exercise {exercise.eID}. Setting score to 0.")
+        return 0
+    
+    agg = aggregated_data.get(exercise.eID)
+
+    if not agg:
+        print(f"No aggregated data found for exercise {exercise.eID}. Assigning high score.")
+        return 100
+
+    avgChallenging = agg.avgChallenging
+    avgFeedback = agg.avgFeedback
+    commonness = agg.commonness
+    rarity = agg.rarity
+    
+    challenging_adjustment = get_challenging_adjustment(avgChallenging)
+    feedback_adjustment = get_feedback_adjustment(avgFeedback)
+    
+    final_score = (
+        field_scores +
+        challenging_adjustment +
+        feedback_adjustment -
+        commonness +
+        rarity +
+        random.randint(-10, 10)
+    )
+    print(f"Final score for exercise {exercise.eID}: {final_score}")
+    return final_score
+
+def get_challenging_adjustment(avgChallenging):
+    if avgChallenging <= 2:
+        return -20
+    elif avgChallenging <= 4:
+        return -10
+    elif avgChallenging <= 6:
+        return 0
+    elif avgChallenging <= 8:
+        return 10
+    else:
+        return -20
+
+def get_feedback_adjustment(avgFeedback):
+    if avgFeedback <= 2:
+        return -20
+    elif avgFeedback <= 4:
+        return -10
+    elif avgFeedback <= 6:
+        return 0
+    elif avgFeedback <= 8:
+        return 10
+    else:
+        return -20
+
+
+############################# TEST VIEW/ FETCH UNLOCKED ##################################################
+@api_view(['GET'])
+def check_unlocked(request):
+    user_id = request.query_params.get('user_id')
+    
+    if not user_id:
+        return Response({"error": "user_id is a required parameter."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    unlocked_exercises = Unlocked.objects.filter(uID=user_id)
+    
+    if not unlocked_exercises.exists():
+        return Response({"error": "No unlocked exercises found for the user."}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = UnlockedSerializer(unlocked_exercises, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
