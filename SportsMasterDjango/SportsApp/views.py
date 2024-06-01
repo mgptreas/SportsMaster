@@ -140,8 +140,10 @@ def select_workout(request):
 def select_exercises(user_id, sport_id, selected_fields, available_time):
     exercises = fetch_unlocked_exercises(user_id, sport_id)
     print(f"Fetched exercises: {exercises}")
-    aggregated_data = {agg.eID: agg for agg in Aggregated.objects.filter(uID=user_id)}
+    aggregated_data = {agg.eID.eID: agg for agg in Aggregated.objects.filter(uID=user_id)}
     print(f"Aggregated data: {aggregated_data}")
+    user_instance = Users.objects.get(uID=user_id) # Fetch the user instance
+    print(f"User instance: {user_instance}")
     sorted_exercises = sort_exercises(exercises, selected_fields, aggregated_data)
     print(f"Sorted exercises: {sorted_exercises}")
     
@@ -149,7 +151,7 @@ def select_exercises(user_id, sport_id, selected_fields, available_time):
     total_time = 0
     
     for exercise, score in sorted_exercises:
-        avgTOC = aggregated_data.get(exercise.eID, {}).get('avgTOC', 5)  # Default to 5 minutes if avgTOC is not available
+        avgTOC = aggregated_data.get(exercise.eID, Aggregated(uID=user_instance, eID=exercise, avgTOC=5)).avgTOC  # Default to 5 minutes if avgTOC is not available
         if total_time + avgTOC <= available_time:
             selected_exercises.append({
                 "eID": exercise.eID,
@@ -191,12 +193,16 @@ def calculate_exercise_score(exercise, selected_fields, aggregated_data):
 
     if not agg:
         print(f"No aggregated data found for exercise {exercise.eID}. Assigning high score.")
-        return 100
+        avgChallenging = 4 # In order to be +0
+        avgFeedback = 5 # In order to be +0
+        commonness = 0  # Do not affect the score
+        rarity = 0 # Increase the score in order for exercise to be selected for the first time
+    else:
+        avgChallenging = agg.avgChallenging
+        avgFeedback = agg.avgFeedback
+        commonness = agg.commonness
+        rarity = agg.rarity
 
-    avgChallenging = agg.avgChallenging
-    avgFeedback = agg.avgFeedback
-    commonness = agg.commonness
-    rarity = agg.rarity
     
     challenging_adjustment = get_challenging_adjustment(avgChallenging)
     feedback_adjustment = get_feedback_adjustment(avgFeedback)
@@ -206,35 +212,41 @@ def calculate_exercise_score(exercise, selected_fields, aggregated_data):
         challenging_adjustment +
         feedback_adjustment -
         commonness +
-        rarity +
-        random.randint(-10, 10)
+        rarity 
+        #+random.randint(-10, 10)
     )
     print(f"Final score for exercise {exercise.eID}: {final_score}")
     return final_score
 
 def get_challenging_adjustment(avgChallenging):
-    if avgChallenging <= 2:
+    if avgChallenging < 2:
         return -20
-    elif avgChallenging <= 4:
+    elif avgChallenging < 4:
         return -10
-    elif avgChallenging <= 6:
+    elif avgChallenging == 4:
         return 0
-    elif avgChallenging <= 8:
+    elif avgChallenging == 5:
         return 10
+    elif avgChallenging <= 7:
+        return 20
+    elif avgChallenging < 8:
+        return -10
     else:
         return -20
 
 def get_feedback_adjustment(avgFeedback):
-    if avgFeedback <= 2:
+    if avgFeedback < 2:
+        return -30
+    elif avgFeedback < 4:
         return -20
-    elif avgFeedback <= 4:
-        return -10
-    elif avgFeedback <= 6:
+    elif avgFeedback  <6:
         return 0
-    elif avgFeedback <= 8:
+    elif avgFeedback < 8:
         return 10
+    elif avgFeedback <= 9:
+        return 20
     else:
-        return -20
+        return 30
 
 
 ############################# TEST VIEW/ FETCH UNLOCKED ##################################################
