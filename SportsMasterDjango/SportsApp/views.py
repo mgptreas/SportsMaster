@@ -247,9 +247,42 @@ def get_feedback_adjustment(avgFeedback):
         return 20
     else:
         return 30
+    
 
 
-############################# TEST VIEW/ FETCH UNLOCKED ##################################################
+############################ USER STATISTICS #######################################################################
+@api_view(['GET'])
+def get_user_exercise_stats(request):
+    user_id = request.query_params.get('uID')
+
+    if not user_id:
+        return Response({"error": "uID is a required parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = Users.objects.get(uID=user_id)
+    except Users.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    aggregated_data = Aggregated.objects.filter(uID=user_id)
+    if not aggregated_data.exists():
+        return Response({"error": "No aggregated data found for the user."}, status=status.HTTP_404_NOT_FOUND)
+
+    exercise_stats = []
+    for agg in aggregated_data:
+        exercise = Exercises.objects.get(eID=agg.eID.eID)
+        exercise_stats.append({
+            "exercise_name": exercise.name,
+            "description": exercise.description,
+            "avgTOC": agg.avgTOC,
+            "avgChallenging": agg.avgChallenging,
+            "avgFeedback": agg.avgFeedback,
+            "CoT": agg.CoT
+        })
+
+    return Response(exercise_stats, status=status.HTTP_200_OK)
+
+
+############################# TEST VIEW/ FETCH UNLOCKED ############################################################
 @api_view(['GET'])
 def check_unlocked(request):
     user_id = request.query_params.get('user_id')

@@ -1,6 +1,7 @@
 package com.example.sportsmasterapp;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -53,21 +54,24 @@ public class RegisterActivity extends AppCompatActivity {
         user.setPassword(password);
 
         ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
-        Call<UserResponse> call = apiService.registerUser(user);
+        Call<User> call = apiService.registerUser(user);
 
-        call.enqueue(new Callback<UserResponse>() {
+        call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+            public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                    // Navigate to login or main activity
+                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                    startActivity(intent);
+
+                    finish();
                 } else {
                     Toast.makeText(RegisterActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<UserResponse> call, Throwable t) {
+            public void onFailure(Call<User> call, Throwable t) {
                 Toast.makeText(RegisterActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

@@ -36,7 +36,9 @@ class Sports(models.Model):
 class Exercises(models.Model):
     eID = models.AutoField(primary_key=True)  # Use AutoField to match SERIAL type in SQL
     sID = models.ForeignKey(Sports, on_delete=models.CASCADE, db_column='sID')  # Use db_column to specify foreign key column name
+    name = models.TextField()
     description = models.TextField()
+    TOC = models.IntegerField(blank=True, null=True)
     video = models.CharField(max_length=255, blank=True, null=True)
     difficulty = models.IntegerField()
     field1 = models.IntegerField(blank=True, null=True)

@@ -1,6 +1,7 @@
 package com.example.sportsmasterapp;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,25 +38,30 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
 
         ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
-        Call<UserResponse> call = apiService.loginUser(usernameEmail, password);
+        Call<User> call = apiService.loginUser(usernameEmail, password);
 
-        call.enqueue(new Callback<UserResponse>() {
+        call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+            public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                    // Navigate to main activity
+                    User userData = response.body();
+                    SessionManager sessionManager = SessionManager.getInstance(LoginActivity.this);
+                    sessionManager.saveUser(userData);
+
+                    Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
+                    startActivity(intent);
+                    finish();
                 } else {
                     Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<UserResponse> call, Throwable t) {
+            public void onFailure(Call<User> call, Throwable t) {
                 Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 
 }
