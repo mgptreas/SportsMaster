@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/background_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background"
+        android:contentDescription="@string/Background"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true" />
+
+    <!-- Logo Image -->
+    <ImageView
+        android:id="@+id/logo_image"
+        android:layout_width="348dp"
+        android:layout_height="155dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/sm_logo_white"
+        android:contentDescription="@string/Logo"/>
+
+    <!-- Username/Email Field -->
+    <EditText
+        android:id="@+id/et_username_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/username_or_email"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"
+        android:layout_below="@id/logo_image"
+        android:layout_marginTop="32dp"
+        android:padding="16dp"
+        android:textSize="16sp" />
+
+    <!-- Password Field -->
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/password"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"
+        android:inputType="textPassword"
+        android:layout_below="@id/et_username_email"
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        android:textSize="16sp" />
+
+    <!-- Login Button -->
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="250dp"
+        android:layout_height="60dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/Login"
+        android:layout_below="@id/et_password"
+        android:layout_marginTop="32dp"
+        android:textSize="20sp"/>
+</RelativeLayout>

@@ -10,6 +10,8 @@ public class User {
     private int points;
     private boolean premium;
 
+    private String password;
+
     // Getters and setters
     public int getUID() {
         return uID;
@@ -73,5 +75,13 @@ public class User {
 
     public void setPremium(boolean premium) {
         this.premium = premium;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

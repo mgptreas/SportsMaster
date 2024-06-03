@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
     <!--Background -->
     <ImageView
+        android:id="@+id/background_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/background"
-        android:scaleType="centerCrop" /> <!-- Adjust scaleType as needed -->
+        android:contentDescription="@string/Background"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"/>
 
 
     <ImageView
@@ -18,7 +20,8 @@
         android:layout_height="155dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:src="@drawable/SportsMasterLogoWhite" />
+        android:src="@drawable/sm_logo_white"
+        android:contentDescription="@string/Logo"/>
 
     <!-- Login Button -->
     <Button
@@ -26,10 +29,11 @@
         android:layout_width="250dp"
         android:layout_height="60dp"
         android:layout_centerHorizontal="true"
-        android:text="Login"
+        android:text="@string/Login"
         android:layout_below="@id/logo_image"
         android:layout_marginTop="32dp"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        />
 
     <!-- Signup Button -->
     <Button
@@ -37,7 +41,7 @@
         android:layout_width="250dp"
         android:layout_height="60dp"
         android:layout_centerHorizontal="true"
-        android:text="Sign Up"
+        android:text="@string/Register"
         android:layout_below="@id/btn_login"
         android:layout_marginTop="16dp"
         android:textSize="20sp"/>
