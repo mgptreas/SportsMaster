@@ -26,7 +26,7 @@
             android:id="@+id/cot_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CoT: " />
+            android:text="Count of Times: " />
         <TextView
             android:id="@+id/tv_cot"
             android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
             android:id="@+id/avg_toc_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Avg TOC: " />
+            android:text="Average TOC (Time Of Completion): " />
         <TextView
             android:id="@+id/tv_avg_toc"
             android:layout_width="wrap_content"
@@ -60,7 +60,7 @@
             android:id="@+id/avg_challenging_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Avg Challenging: " />
+            android:text="Average Challenging: " />
         <TextView
             android:id="@+id/tv_avg_challenging"
             android:layout_width="wrap_content"
@@ -77,7 +77,7 @@
             android:id="@+id/avg_feedback_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Avg Feedback: " />
+            android:text="Average Feedback: " />
         <TextView
             android:id="@+id/tv_avg_feedback"
             android:layout_width="wrap_content"

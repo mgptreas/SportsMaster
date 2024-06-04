@@ -1,6 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@drawable/background"
+    android:theme="@style/AppTheme">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Top left lock icon -->
+    <ImageView
+        android:id="@+id/iv_lock_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/lock"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp" />
+
+    <!--Top center logo -->
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/logo_white"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp" />
+
+    <!-- Top right home icon -->
+    <ImageView
+        android:id="@+id/iv_user_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/user_icon"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/tv_select_fields"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_logo"
+        android:layout_marginTop="16dp"
+        android:text="Select Fields to Improve:"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_select_fields"
+        android:layout_above="@id/tv_time_available">
+
+        <LinearLayout
+            android:id="@+id/field_checkboxes_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/tv_time_available"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/time_picker_layout"
+        android:layout_marginBottom="16dp"
+        android:text="Time Available:"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/time_picker_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/btn_generate_workout">
+
+        <NumberPicker
+            android:id="@+id/np_hours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/NumberPickerText"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text=" hours "
+            android:textColor="@color/white"/>
+
+        <NumberPicker
+            android:id="@+id/np_minutes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/NumberPickerText" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text=" minutes"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_generate_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Generate Workout"
+        android:enabled="false"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

@@ -3,6 +3,8 @@ package com.example.sportsmasterapp;
 //Interface that defines the structure of the API endpoints
 
 import java.util.List;
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -23,4 +25,7 @@ public interface ApiService {
 
     @GET("api/get_exercises_with_sport/")
     Call<List<Exercise>> getAllExercises(@Query("uID") int userId);
+
+    @GET("/api/get_sport_fields/")
+    Call<Map<String, List<String>>> getSportFields(@Query("sport_name") String sportName);
 }

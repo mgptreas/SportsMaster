@@ -10,4 +10,6 @@ urlpatterns = [
     path('check_unlocked/', views.check_unlocked, name='check_unlocked'),
     path('get_user_exercise_stats/', views.get_user_exercise_stats, name='get_user_exercise_stats'),
     path('get_exercises_with_sport/', views.get_exercises_with_sport, name='get_exercises_with_sport'),
+    path('get_sport_fields/', views.get_sport_fields, name='get_sport_fields'),
+    
 ]

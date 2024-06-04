@@ -8,7 +8,7 @@ from .serializers import *
 
 
 
-################################################ REGISTER/LOGIN USER #####################################################
+################################################ REGISTER/LOGIN USER ######################################################################################################
 #Get all users
 @api_view(['GET'])
 def get_all_users(request):
@@ -92,8 +92,35 @@ def login_user(request):
     except UserAuth.DoesNotExist:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
     
+###################################### SELECT FIELDS FOR WORKOUT ###########################################################################################################
 
-####################################### SELECT EXERCISES FOR WORKOUT ##################################################
+@api_view(['GET'])
+def get_sport_fields(request):
+    sport_name = request.query_params.get('sport_name')
+
+    if not sport_name:
+        return Response({"error": "sport_name is a required parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        sport = Sports.objects.get(name=sport_name)
+    except Sports.DoesNotExist:
+        return Response({"error": "Sport not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    # Get the fields of the sport as a list of strings (excluding nulls and empty strings)
+    fields = [
+        field for field in [
+            sport.field1, 
+            sport.field2, 
+            sport.field3, 
+            sport.field4, 
+            sport.field5
+        ]
+        if field and field.strip()  # Check for both None and empty strings
+    ]
+
+    return Response({"fields": fields})
+
+####################################### SELECT EXERCISES FOR WORKOUT #######################################################################################################
 
 @api_view(['GET'])
 def select_workout(request):
@@ -250,7 +277,7 @@ def get_feedback_adjustment(avgFeedback):
     
 
 
-############################ USER STATISTICS #######################################################################
+############################ USER STATISTICS ##############################################################################################################################
 @api_view(['GET'])
 def get_user_exercise_stats(request):
     user_id = request.query_params.get('uID')
@@ -283,7 +310,7 @@ def get_user_exercise_stats(request):
     return Response(exercise_stats, status=status.HTTP_200_OK)
 
 
-############################# FETCH UNLOCKED #######################################################################
+############################# FETCH UNLOCKED #############################################################################################################################
 @api_view(['GET'])
 def check_unlocked(request):
     user_id = request.query_params.get('user_id')

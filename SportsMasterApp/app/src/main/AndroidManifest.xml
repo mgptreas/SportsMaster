@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SportsMasterApp"
+        android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity android:name=".LoginRegister"
             android:exported="true">
@@ -29,6 +29,7 @@
         <activity android:name=".UnlockedExercisesActivity"></activity>
         <activity android:name=".ExerciseInfoActivity"></activity>
         <activity android:name=".FieldSelectActivity"></activity>
+        <activity android:name=".WorkoutActivity"></activity>
     </application>
 
 </manifest>
