@@ -29,4 +29,4 @@ class SportsSerializer(serializers.ModelSerializer):
 class ExercisesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Exercises
-        fields = ['eID', 'sID', 'description', 'video', 'difficulty', 'field1', 'field2', 'field3', 'field4', 'field5']
+        fields = ['eID','sID', 'name', 'description', 'TOC', 'video', 'difficulty', 'field1', 'field2', 'field3', 'field4', 'field5'] 

@@ -5,27 +5,38 @@
     android:padding="16dp"
     android:background="@drawable/background">
 
-    <!-- Logo Image on the top left corner -->
+    <!-- Top left lock icon -->
+    <ImageView
+        android:id="@+id/iv_lock_icon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/lock"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp" />
+
+    <!--Top center logo -->
     <ImageView
         android:id="@+id/iv_logo"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_alignParentStart="true"
+        android:src="@drawable/logo_white"
+        android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/logo_white" />
+        android:layout_marginTop="16dp" />
 
-    <!-- Image on the top right corner -->
+    <!-- Top right home icon -->
     <ImageView
         android:id="@+id/iv_home_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/home"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/home" />
+        android:layout_marginTop="16dp" />
+
 
     <TextView
         android:id="@+id/tv_title"

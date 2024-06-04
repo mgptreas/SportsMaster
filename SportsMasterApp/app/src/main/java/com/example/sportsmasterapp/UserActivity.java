@@ -32,7 +32,8 @@ public class UserActivity extends AppCompatActivity {
     private ProgressBar loadingSpinner;
     private ExerciseStatAdapter exerciseStatAdapter;
     private boolean showingUserInfo = true;
-    private ImageView ivHomeIcon; //Hom icon to go back to home screen
+    private ImageView ivHomeIcon; //Home icon to go back to home screen
+    private ImageView ivLockIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,7 @@ public class UserActivity extends AppCompatActivity {
         rvExerciseStats = findViewById(R.id.rv_exercise_stats);
         loadingSpinner = findViewById(R.id.loading_spinner);
         ivHomeIcon = findViewById(R.id.iv_home_icon);
+        ivLockIcon = findViewById(R.id.iv_lock_icon);
 
 
         rvExerciseStats.setLayoutManager(new LinearLayoutManager(this));
@@ -82,6 +84,13 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
+        ivLockIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserActivity.this, UnlockedExercisesActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void displayUserInfo() {
@@ -106,9 +115,9 @@ public class UserActivity extends AppCompatActivity {
     private void fetchAndDisplayExerciseStats() {
         User user = sessionManager.getUser();
         if (user == null) {
-            /*Toast.makeText(UserActivity.this, "No user found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(UserActivity.this, "No user found", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(UserActivity.this, LoginActivity.class);
-            startActivity(intent);*/
+            startActivity(intent);
             return;
         }
 

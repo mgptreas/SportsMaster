@@ -17,4 +17,10 @@ public interface ApiService {
     Call<User> loginUser(@Query("username") String username, @Query("password") String password);
     @GET("api/get_user_exercise_stats/")
     Call<List<ExerciseStat>> getUserExerciseStats(@Query("uID") int userId);
+
+    @GET("/api/check_unlocked/")
+    Call<List<Integer>> getUnlockedExercises(@Query("user_id") int userId);
+
+    @GET("api/get_exercises_with_sport/")
+    Call<List<Exercise>> getAllExercises(@Query("uID") int userId);
 }

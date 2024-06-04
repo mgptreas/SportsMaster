@@ -1,19 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
-    android:scaleType="centerCrop"
-    android:adjustViewBounds="true"
-    tools:context=".HomeScreenActivity">
+    android:padding="16dp"
+    android:background="@drawable/background">
 
     <!-- Top left lock icon -->
     <ImageView
-        android:id="@+id/iv_lock_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/lock"
+        android:id="@+id/iv_home_icon"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/home"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="16dp"
@@ -40,13 +36,17 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp" />
 
-    <!-- Center Text saying "Home Screen" -->
-    <TextView
-        android:id="@+id/tv_home"
+    <ProgressBar
+        android:id="@+id/loading_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Home Screen"
-        android:textSize="24sp"
-        android:textColor="@android:color/black" />
+        android:layout_centerInParent="true" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_unlocked_exercises"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/iv_logo"
+        android:layout_marginTop="16dp" />
+
 </RelativeLayout>

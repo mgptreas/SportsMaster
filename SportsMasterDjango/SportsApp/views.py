@@ -283,7 +283,7 @@ def get_user_exercise_stats(request):
     return Response(exercise_stats, status=status.HTTP_200_OK)
 
 
-############################# TEST VIEW/ FETCH UNLOCKED ############################################################
+############################# FETCH UNLOCKED #######################################################################
 @api_view(['GET'])
 def check_unlocked(request):
     user_id = request.query_params.get('user_id')
@@ -298,3 +298,36 @@ def check_unlocked(request):
     
     serializer = UnlockedSerializer(unlocked_exercises, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_exercises_with_sport(request):
+    user_id = request.query_params.get('uID')
+
+    if not user_id:
+        return Response({"error": "uID is a required parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = Users.objects.get(uID=user_id)
+    except Users.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    # Get unlocked exercise IDs for the user
+    unlocked_exercise_ids = Unlocked.objects.filter(uID=user).values_list('eID', flat=True)
+
+    # Get all exercises and their associated sport names
+    exercises = Exercises.objects.select_related('sID') 
+
+    # Create a list of dictionaries to hold the serialized exercise data
+    serialized_exercises = []
+    for exercise in exercises:
+        sport_name = exercise.sID.name if exercise.sID else None  # Get sport name or None if exercise has no sport
+        is_unlocked = exercise.eID in unlocked_exercise_ids   # Check if exercise is unlocked for user
+
+        # Serialize the exercise data
+        serialized_exercise = ExercisesSerializer(exercise).data
+        serialized_exercise['sport_name'] = sport_name
+        serialized_exercise['is_unlocked'] = is_unlocked
+
+        serialized_exercises.append(serialized_exercise)
+
+    return Response(serialized_exercises) 

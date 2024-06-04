@@ -26,6 +26,8 @@
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".HomeScreenActivity"></activity>
         <activity android:name=".UserActivity"></activity>
+        <activity android:name=".UnlockedExercisesActivity"></activity>
+        <activity android:name=".ExerciseInfoActivity"></activity>
     </application>
 
 </manifest>
