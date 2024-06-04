@@ -254,6 +254,7 @@ def get_feedback_adjustment(avgFeedback):
 @api_view(['GET'])
 def get_user_exercise_stats(request):
     user_id = request.query_params.get('uID')
+    print(f"Received parameters - user_id: {user_id}")
 
     if not user_id:
         return Response({"error": "uID is a required parameter."}, status=status.HTTP_400_BAD_REQUEST)

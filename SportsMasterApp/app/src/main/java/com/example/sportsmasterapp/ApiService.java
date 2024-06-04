@@ -15,6 +15,6 @@ public interface ApiService {
 
     @GET("/api/login_user/")
     Call<User> loginUser(@Query("username") String username, @Query("password") String password);
-    @GET("api/get-user-exercise-stats/")
+    @GET("api/get_user_exercise_stats/")
     Call<List<ExerciseStat>> getUserExerciseStats(@Query("uID") int userId);
 }
