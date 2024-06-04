@@ -28,6 +28,7 @@
         <activity android:name=".UserActivity"></activity>
         <activity android:name=".UnlockedExercisesActivity"></activity>
         <activity android:name=".ExerciseInfoActivity"></activity>
+        <activity android:name=".FieldSelectActivity"></activity>
     </application>
 
 </manifest>
