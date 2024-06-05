@@ -126,15 +126,15 @@ def get_sport_fields(request):
 def select_workout(request):
     user_id = request.query_params.get('uID')
     sport_name = request.query_params.get('sport_name')
-    selected_fields = request.query_params.get('fields')
+    selected_fields_str = request.query_params.get('fields')
     available_time = request.query_params.get('time')
 
-    print(f"Received parameters - user_id: {user_id}, sport_name: {sport_name}, selected_fields: {selected_fields}, available_time: {available_time}")
+    print(f"Received parameters - user_id: {user_id}, sport_name: {sport_name}, selected_fields: {selected_fields_str}, available_time: {available_time}")
 
-    if not (user_id and sport_name and selected_fields and available_time):
+    if not (user_id and sport_name and selected_fields_str and available_time):
         return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    selected_fields = selected_fields.split(',')
+    selected_fields = [field.strip() for field in selected_fields_str.split(',')] #Remove whitespace around fields
     print(f"Split selected_fields: {selected_fields}")
     
     available_time = int(available_time)
@@ -173,6 +173,12 @@ def select_exercises(user_id, sport_id, selected_fields, available_time):
     print(f"User instance: {user_instance}")
     sorted_exercises = sort_exercises(exercises, selected_fields, aggregated_data)
     print(f"Sorted exercises: {sorted_exercises}")
+
+    # Filter out exercises with a score of 0 in any selected field
+    sorted_exercises = [
+        (exercise, score) for exercise, score in sorted_exercises
+        if all(getattr(exercise, f"field{i+1}") > 0 for i in selected_fields)
+    ]
     
     selected_exercises = []
     total_time = 0
@@ -240,7 +246,7 @@ def calculate_exercise_score(exercise, selected_fields, aggregated_data):
         feedback_adjustment -
         commonness +
         rarity 
-        #+random.randint(-10, 10)
+        +random.randint(-10, 10)
     )
     print(f"Final score for exercise {exercise.eID}: {final_score}")
     return final_score
@@ -358,3 +364,34 @@ def get_exercises_with_sport(request):
         serialized_exercises.append(serialized_exercise)
 
     return Response(serialized_exercises) 
+
+
+########################################### GET EXERCISE INFO ######################################################################################
+@api_view(['GET'])
+def get_exercise_info(request):
+    exercise_id = request.query_params.get('eID')
+    
+    if not exercise_id:
+        return Response({"error": "exercise_id is a required parameter."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        exercise = Exercises.objects.get(eID=exercise_id)
+        sport = exercise.sID
+        fields = [sport.field1, sport.field2, sport.field3, sport.field4, sport.field5]
+        
+        field_data = {f'field{i+1}': getattr(exercise, f'field{i+1}') for i, field in enumerate(fields) if field}
+        
+        response_data = {
+            'eID': exercise.eID,
+            'name': exercise.name,
+            'description': exercise.description,
+            'video': exercise.video,
+            'difficulty': exercise.difficulty,
+            'TOC': exercise.TOC,
+            'fields': field_data
+        }
+        
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    except Exercises.DoesNotExist:
+        return Response({"error": "Exercise not found."}, status=status.HTTP_404_NOT_FOUND)

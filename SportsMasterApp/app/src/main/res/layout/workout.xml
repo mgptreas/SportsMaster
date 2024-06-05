@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@drawable/background"
+    android:theme="@style/AppTheme">
+
+    <!-- Top left lock icon -->
+    <ImageView
+        android:id="@+id/iv_home_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/home"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp" />
+
+    <!-- Top center logo -->
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/logo_white"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp" />
+
+    <!-- Top right user icon -->
+    <ImageView
+        android:id="@+id/iv_user_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/user_icon"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp" />
+
+    <!-- Stopwatch TextView -->
+    <TextView
+        android:id="@+id/tv_stopwatch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="00:00:00"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- ScrollView for exercises -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_stopwatch"
+        android:layout_above="@id/btn_end_workout"
+        android:layout_marginTop="16dp">
+
+        <LinearLayout
+            android:id="@+id/ll_exercises"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <!-- End Workout Button -->
+    <Button
+        android:id="@+id/btn_end_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:text="End Workout"
+        android:enabled="false" />
+
+</RelativeLayout>

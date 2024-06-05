@@ -39,16 +39,19 @@ public class Exercise implements Parcelable {
     @SerializedName("field5")
     private int field5;
 
-    @SerializedName("sport_name") // Map to the "sport_name" field in JSON
+    @SerializedName("sport_name")
     private String sportName;
 
     @SerializedName("is_unlocked")
     private boolean isUnlocked;
 
+    @SerializedName("TOC")
+    private double TOC;
+
 
     // Constructor
     public Exercise(int eID, int sID, String name, String description, String video, int difficulty,
-                    int field1, int field2, int field3, int field4, int field5, String sportName, boolean isUnlocked) {
+                    int field1, int field2, int field3, int field4, int field5, String sportName, boolean isUnlocked, double TOC) {
         this.eID = eID;
         this.sID = sID;
         this.name = name;
@@ -62,6 +65,7 @@ public class Exercise implements Parcelable {
         this.field5 = field5;
         this.sportName = sportName;
         this.isUnlocked = isUnlocked;
+        this.TOC = TOC;
     }
 
     // Parcelable Constructor (for passing between Activities)
@@ -185,6 +189,16 @@ public class Exercise implements Parcelable {
 
     public void setIsUnlocked(boolean isUnlocked){
         this.isUnlocked = isUnlocked;
+    }
+
+    // Getter for TOC
+    public double getTOC() {
+        return TOC;
+    }
+
+    // Setter for TOC
+    public void setTOC(double TOC) {
+        this.TOC = TOC;
     }
 
     // Parcelable methods

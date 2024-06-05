@@ -28,4 +28,15 @@ public interface ApiService {
 
     @GET("/api/get_sport_fields/")
     Call<Map<String, List<String>>> getSportFields(@Query("sport_name") String sportName);
+
+    @GET("/api/select_workout/")
+    Call<List<Exercise>> selectWorkout(
+            @Query("uID") int userId,
+            @Query("sport_name") String sportName,
+            @Query("fields") String fields, // Comma-separated list of fields
+            @Query("time") int timeAvailable // Time in minutes
+    );
+
+    @GET("get_exercise_info/")
+    Call<Exercise> getExerciseInfo(@Query("eID") int exerciseId);
 }

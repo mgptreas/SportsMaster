@@ -11,5 +11,5 @@ urlpatterns = [
     path('get_user_exercise_stats/', views.get_user_exercise_stats, name='get_user_exercise_stats'),
     path('get_exercises_with_sport/', views.get_exercises_with_sport, name='get_exercises_with_sport'),
     path('get_sport_fields/', views.get_sport_fields, name='get_sport_fields'),
-    
+    path('get_exercise_info/', views.get_exercise_info, name='get_exercise_info'),
 ]

@@ -28,8 +28,15 @@ curl -X GET "http://127.0.0.1:8000/api/login_user/?username=newuser&password=pas
 
 
 #Select a workout
-curl -X GET "http://127.0.0.1:8000/api/select_workout/?uID=1&sport_name=Sport%20A&fields=Field%20A1,Field%20A3&time=30" #Probably doesn't Work yet
+curl -X GET "http://127.0.0.1:8000/api/select_workout/?uID=22&sport_name=Sport%20A&fields=Field%20A1,Field%20A3&time=30" 
 curl -X GET "http://127.0.0.1:8000/api/select_workout/?uID=22&sport_name=Sport%20A&fields=Field%20A1&time=30"
 
 
 curl -X GET "http://127.0.0.1:8000/api/get-user-exercise-stats/?uID=22"
+
+curl -X GET "http://127.0.0.1:8000/api/get_exercises_with_sport/?uID=22"
+
+curl -X GET "http://127.0.0.1:8000/api/get_sport_fields/?sport_name=Sport%20A"
+
+curl -X GET "http://127.0.0.1:8000/api/get_exercise_info?eID=253"
+
