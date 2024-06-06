@@ -36,7 +36,7 @@ def get_user_profile(user):
 #Exercises that will be unlocked when a user registers
 def unlock_exercises_for_user(user):
     # Define exercise IDs to be unlocked
-    exercise_ids = [1, 2, 3, 4, 5]  #eID that will be unlocked
+    exercise_ids = [1, 3, 5, 7, 8, 9, 12, 13, 15, 18, 19, 25, 27]  #eID that will be unlocked
 
     # Loop through exercise_ids and create UnlockedExercises objects for each exercise
     for exercise_id in exercise_ids:
