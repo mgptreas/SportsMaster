@@ -4,7 +4,6 @@
     <string name = "Background">Background Image</string>
     <string name = "Login">Login</string>
     <string name = "Register">Register</string>
-    <string name = "username_or_email">Username/Email</string>
     <string name="username">Username</string>
     <string name="name">Name</string>
     <string name="email">Email</string>

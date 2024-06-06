@@ -59,6 +59,9 @@ def register_user(request):
     
     if user_serializer.is_valid():
         user = user_serializer.save()
+
+        unlock_exercises_for_user(user) #Unlock exercises for user
+
         user_auth_data = {
             'uID': user.uID,
             'username': data.get('username'),
@@ -74,6 +77,16 @@ def register_user(request):
             return Response(user_auth_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#Exercises that will be unlocked when a user registers
+def unlock_exercises_for_user(user):
+    # Define exercise IDs to be unlocked
+    exercise_ids = [1, 2, 3, 4, 5]  #eID that will be unlocked
+
+    # Loop through exercise_ids and create UnlockedExercises objects for each exercise
+    for exercise_id in exercise_ids:
+        unlocked_exercise = Unlocked.objects.create(user=user, exercise_id=exercise_id)
+        unlocked_exercise.save()
 
 #Check Login information
 @api_view(['GET'])

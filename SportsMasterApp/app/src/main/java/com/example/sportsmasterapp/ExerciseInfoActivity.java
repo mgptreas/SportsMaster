@@ -85,6 +85,9 @@ public class ExerciseInfoActivity extends AppCompatActivity {
                             // Exercise unlocked successfully
                             Toast.makeText(ExerciseInfoActivity.this, "Exercise unlocked successfully.", Toast.LENGTH_SHORT).show();
 
+                            user.setPoints(user.getPoints() - 5);
+                            sessionManager.saveUser(user);
+
                             // Navigate to HomeScreenActivity
                             Intent intent = new Intent(ExerciseInfoActivity.this, HomeScreenActivity.class);
                             startActivity(intent);
