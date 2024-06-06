@@ -1,8 +1,11 @@
 package com.example.sportsmasterapp;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 import android.widget.Button;
 import android.view.View;
@@ -34,6 +37,46 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         // Fetch exercise info
         Exercise exercise = getIntent().getParcelableExtra("exercise");
         displayExerciseInfo(exercise);
+
+        SessionManager sessionManager = SessionManager.getInstance(this);
+        User user = sessionManager.getUser(); // Fetch the user's information from the session
+
+        btnUnlock.setOnClickListener(v -> {
+            // Check if the user object is not null and has more than 5 coins
+            if (user != null && user.getPoints() >= 5) {
+                // Call the API to unlock the exercise
+                ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
+                Call<Void> call = apiService.unlockExercise(user.getUID(), exercise.getEID());
+
+                call.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (response.isSuccessful()) {
+                            // Exercise unlocked successfully
+                            Toast.makeText(ExerciseInfoActivity.this, "Exercise unlocked successfully.", Toast.LENGTH_SHORT).show();
+
+                            // Navigate to HomeScreenActivity
+                            Intent intent = new Intent(ExerciseInfoActivity.this, HomeScreenActivity.class);
+                            startActivity(intent);
+                            finish(); // Finish current activity
+                        } else {
+                            // Failed to unlock exercise
+                            Toast.makeText(ExerciseInfoActivity.this, "Failed to unlock exercise.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        // Network error
+                        Toast.makeText(ExerciseInfoActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                        Log.e("ExerciseInfoActivity", "Network Error: " + t.getMessage());
+                    }
+                });
+            } else {
+                // Insufficient points or user is not logged in
+                Toast.makeText(ExerciseInfoActivity.this, "Please log in or earn more points to unlock the exercise.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void displayExerciseInfo(Exercise exercise) {

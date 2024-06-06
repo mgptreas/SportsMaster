@@ -376,10 +376,17 @@ def get_exercise_info(request):
     
     try:
         exercise = Exercises.objects.get(eID=exercise_id)
-        sport = exercise.sID
-        fields = [sport.field1, sport.field2, sport.field3, sport.field4, sport.field5]
-        
-        field_data = {f'field{i+1}': getattr(exercise, f'field{i+1}') for i, field in enumerate(fields) if field}
+         
+        sport = exercise.sID  # Assuming sID is the foreign key to Sport
+        fields = [getattr(sport, f'field{i+1}') for i in range(5)]  # Retrieve field names from Sport
+
+        # Retrieve field values from Exercise
+        field_values = [
+            getattr(exercise, f'field{i+1}') for i in range(5)
+        ]
+
+        # Create a dictionary mapping field names to field values
+        field_data = {field_name: field_value for field_name, field_value in zip(fields, field_values)}
         
         response_data = {
             'eID': exercise.eID,
@@ -395,3 +402,35 @@ def get_exercise_info(request):
     
     except Exercises.DoesNotExist:
         return Response({"error": "Exercise not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+
+######################################## UNLOCK EXERCISE ############################################################################################
+@api_view(['POST'])
+def unlock_exercise(request):
+    user_id = request.data.get('uID')
+    exercise_id = request.data.get('eID')
+
+    if not user_id or not exercise_id:
+        return Response({"error": "Both userID and exerciseID are required parameters."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = Users.objects.get(id=user_id)
+    except Users.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    # Check if the user has enough points to unlock the exercise
+    if user.points < 5:
+        return Response({"error": "Insufficient points to unlock the exercise."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Deduct 5 points from the user's points
+        user.points -= 5
+        user.save()
+
+        # Add entry to the Unlocked table to indicate that the exercise is unlocked for the user
+        Unlocked.objects.create(user_id=user_id, exercise_id=exercise_id)
+
+        return Response({"message": "Exercise unlocked successfully."}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

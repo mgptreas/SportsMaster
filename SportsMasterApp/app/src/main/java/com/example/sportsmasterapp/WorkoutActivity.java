@@ -129,6 +129,7 @@ public class WorkoutActivity extends AppCompatActivity {
         }
     }
 
+
     private void startExercise(int index, Button btnStartStop) {
         currentExerciseIndex = index;
         startTime = System.currentTimeMillis();
@@ -188,6 +189,8 @@ public class WorkoutActivity extends AppCompatActivity {
         Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         positiveButton.setTextColor(getResources().getColor(android.R.color.black));
     }
+
+
 
     private Runnable updateTimer = new Runnable() {
         public void run() {

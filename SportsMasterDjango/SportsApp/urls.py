@@ -12,4 +12,5 @@ urlpatterns = [
     path('get_exercises_with_sport/', views.get_exercises_with_sport, name='get_exercises_with_sport'),
     path('get_sport_fields/', views.get_sport_fields, name='get_sport_fields'),
     path('get_exercise_info/', views.get_exercise_info, name='get_exercise_info'),
+    path('unlock_exercise/', views.unlock_exercise, name='unlock_exercise'),
 ]
