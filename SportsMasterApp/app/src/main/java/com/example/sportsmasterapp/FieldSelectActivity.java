@@ -38,7 +38,7 @@ public class FieldSelectActivity extends AppCompatActivity {
         setContentView(R.layout.field_select);
 
         // Initialize top icons
-        ivHomeIcon = findViewById(R.id.iv_lock_icon);
+        ivHomeIcon = findViewById(R.id.iv_home_icon);
         ivUserIcon = findViewById(R.id.iv_user_icon);
         ivLogoIcon = findViewById(R.id.iv_logo);
 

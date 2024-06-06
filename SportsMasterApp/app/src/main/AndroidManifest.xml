@@ -30,7 +30,6 @@
         <activity android:name=".ExerciseInfoActivity"></activity>
         <activity android:name=".FieldSelectActivity"></activity>
         <activity android:name=".WorkoutActivity"></activity>
-        <activity android:name=".ExerciseInfoActivity"></activity>
     </application>
 
 </manifest>

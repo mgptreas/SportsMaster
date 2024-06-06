@@ -8,10 +8,10 @@
 
     <!-- Top left lock icon -->
     <ImageView
-        android:id="@+id/iv_lock_icon"
+        android:id="@+id/iv_home_icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/lock"
+        android:src="@drawable/home"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="16dp"

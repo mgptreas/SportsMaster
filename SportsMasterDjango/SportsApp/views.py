@@ -33,6 +33,16 @@ def get_user_profile(user):
     }
     return user_data
 
+#Exercises that will be unlocked when a user registers
+def unlock_exercises_for_user(user):
+    # Define exercise IDs to be unlocked
+    exercise_ids = [1, 2, 3, 4, 5]  #eID that will be unlocked
+
+    # Loop through exercise_ids and create UnlockedExercises objects for each exercise
+    for exercise_id in exercise_ids:
+        unlocked_exercise = Unlocked.objects.create(user=user, exercise_id=exercise_id)
+        unlocked_exercise.save()
+
 #Register a User
 @api_view(['POST'])
 def register_user(request):
@@ -81,15 +91,7 @@ def register_user(request):
     
     return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#Exercises that will be unlocked when a user registers
-def unlock_exercises_for_user(user):
-    # Define exercise IDs to be unlocked
-    exercise_ids = [1, 2, 3, 4, 5]  #eID that will be unlocked
 
-    # Loop through exercise_ids and create UnlockedExercises objects for each exercise
-    for exercise_id in exercise_ids:
-        unlocked_exercise = Unlocked.objects.create(user=user, exercise_id=exercise_id)
-        unlocked_exercise.save()
 
 #Check Login information
 @api_view(['GET'])
@@ -485,7 +487,7 @@ def update_aggregated_stats(uID, eID):
 
             try:
                 aggregated_stats = Aggregated.objects.get(uID=uID, eID=eID)
-                aggregated_stats.count = count
+                aggregated_stats.CoT = count
                 aggregated_stats.avgTOC = round(avg_toc, 1)
                 aggregated_stats.avgChallenging = round(avg_challenging, 1)
                 aggregated_stats.avgFeedback = round(avg_feedback, 1)

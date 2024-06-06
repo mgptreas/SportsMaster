@@ -16,7 +16,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,8 +167,12 @@ public class WorkoutActivity extends AppCompatActivity {
         builder.setPositiveButton("Submit", (dialog, which) -> {
             int challenging = npChallenging.getValue();
             int feedback = npFeedback.getValue();
+            int exerciseId = exercises.get(index).getEID();
+            int uID = SessionManager.getInstance(this).getUser().getUID();
 
-            exerciseStatsMap.put(index, new ExerciseStats(timeInMilliseconds, challenging, feedback, System.currentTimeMillis()));
+            long timeInMinutes = timeInMilliseconds / (1000 * 60);
+
+            exerciseStatsMap.put(index, new ExerciseStats(exerciseId, timeInMinutes, challenging, feedback, System.currentTimeMillis(), uID));
 
             btnStartStop.setEnabled(false);
             if (index + 1 < exercises.size()) {
@@ -205,23 +211,69 @@ public class WorkoutActivity extends AppCompatActivity {
     };
 
     private void endWorkout() {
-        Intent intent = new Intent(WorkoutActivity.this, WorkoutRecapActivity.class);
-        intent.putExtra("exercise_stats", new ArrayList<>(exerciseStatsMap.values()));
+        // 1. Save Statistics to Backend
+        sendStatisticsToBackend(exerciseStatsMap.values());
+
+        // 2. Navigate to HomeScreenActivity
+        Intent intent = new Intent(WorkoutActivity.this, HomeScreenActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear activity stack up to HomeScreenActivity
         startActivity(intent);
+    }
+
+    private void sendStatisticsToBackend(Collection<ExerciseStats> exerciseStats) {
+        for (ExerciseStats stats : exerciseStats) {
+            sendSingleStatistic(stats);
+        }
+    }
+
+    private void sendSingleStatistic(ExerciseStats stats) {
+        ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
+
+        Call<Void> call = apiService.sendExerciseStats(
+                stats.getUID(), stats.getExerciseId(), (int) stats.getDuration() / 1000, // Convert to seconds
+                stats.getChallenging(), stats.getFeedback());
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Log.d("WorkoutActivity", "Stats sent successfully");
+                } else {
+                    // Handle error (e.g., display an error message)
+                    Log.e("WorkoutActivity", "Failed to send stats: ");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // Handle network error (e.g., display an error message)
+                Log.e("WorkoutActivity", "Error sending stats: " + t.getMessage());
+            }
+        });
     }
 }
 
-class ExerciseStats {
+class ExerciseStats implements Serializable {
+
+    private int exerciseId;
     private long duration;
     private int challenging;
     private int feedback;
     private long timestamp;
+    private int uID;
 
-    public ExerciseStats(long duration, int challenging, int feedback, long timestamp) {
+    public ExerciseStats(int exerciseId, long duration, int challenging, int feedback, long timestamp, int uID) {
+        this.exerciseId = exerciseId;
         this.duration = duration;
         this.challenging = challenging;
         this.feedback = feedback;
         this.timestamp = timestamp;
+        this.uID = uID;
+    }
+
+    // Getters
+    public int getExerciseId() {
+        return exerciseId;
     }
 
     public long getDuration() {
@@ -239,4 +291,34 @@ class ExerciseStats {
     public long getTimestamp() {
         return timestamp;
     }
+
+    public int getUID() {
+        return uID;
+    }
+
+    // Setters (optional, but good practice to include)
+    public void setExerciseId(int exerciseId) {
+        this.exerciseId = exerciseId;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
+    public void setChallenging(int challenging) {
+        this.challenging = challenging;
+    }
+
+    public void setFeedback(int feedback) {
+        this.feedback = feedback;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setUID(int uID) {
+        this.uID = uID;
+    }
+
 }

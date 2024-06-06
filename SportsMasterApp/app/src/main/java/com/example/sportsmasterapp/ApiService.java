@@ -44,4 +44,13 @@ public interface ApiService {
 
     @POST("/api/unlock_exercise/")
     Call<Void> unlockExercise(@Body UnlockRequest unlockRequest);
+
+    @POST("api/save_exercise_instance_stats/")
+    Call<Void> sendExerciseStats(
+            @Query("uID") int uID,
+            @Query("eID") int eID,
+            @Query("TOC") int toc,
+            @Query("challenging") int challenging,
+            @Query("feedback") int feedback
+    );
 }
