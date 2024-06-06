@@ -37,6 +37,6 @@ public interface ApiService {
             @Query("time") int timeAvailable // Time in minutes
     );
 
-    @GET("get_exercise_info/")
+    @GET("/api/get_exercise_info/")
     Call<Exercise> getExerciseInfo(@Query("eID") int exerciseId);
 }
