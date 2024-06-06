@@ -1,10 +1,13 @@
 import random
+from django.db.models import Avg
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from .serializers import *
+from django.utils import timezone
+from django.db import transaction
 
 
 
@@ -439,3 +442,84 @@ def unlock_exercise(request):
 
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+########################################### PRODUCE/SAVE WORKOUT STATS ###############################################################################
+# View to return exercise statistics
+@api_view(['GET'])
+def get_exercise_stats(request):
+    uID = request.query_params.get('uID')
+    eID = request.query_params.get('eID')
+
+    if not uID or not eID:
+        return Response({"error": "uID and eID are required parameters."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        stats = Aggregated.objects.get(uID=uID, eID=eID)
+
+        # Extract relevant data from the stats object, avoiding direct inclusion of model instances
+        response_data = {
+            'uID': stats.uID_id,
+            'eID': stats.eID_id,
+            'count': stats.CoT,
+            'avgTOC': round(stats.avgTOC, 1),
+            'avgChallenging': round(stats.avgChallenging, 1),
+            'avgFeedback': round(stats.avgFeedback, 1),
+            # ... other aggregated data as needed ...
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+    except Aggregated.DoesNotExist:
+        return Response({"error": "Statistics not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+
+def update_aggregated_stats(uID, eID):
+    with transaction.atomic():
+        instance_stats = Analytical.objects.filter(uID=uID, eID=eID)
+        count = instance_stats.count()
+
+        if count > 0:
+            avg_toc = instance_stats.aggregate(Avg('toc'))['toc__avg']
+            avg_challenging = instance_stats.aggregate(Avg('challenging'))['challenging__avg']
+            avg_feedback = instance_stats.aggregate(Avg('feedback'))['feedback__avg']
+
+            try:
+                aggregated_stats = Aggregated.objects.get(uID=uID, eID=eID)
+                aggregated_stats.count = count
+                aggregated_stats.avgTOC = round(avg_toc, 1)
+                aggregated_stats.avgChallenging = round(avg_challenging, 1)
+                aggregated_stats.avgFeedback = round(avg_feedback, 1)
+                # ... update other aggregated fields if needed ...
+                aggregated_stats.save()
+            except Aggregated.DoesNotExist:
+                # Create new aggregated record if it doesn't exist
+                Aggregated.objects.create(
+                    uID=uID, eID=eID, count=count,
+                    avgTOC=round(avg_toc, 1), 
+                    avgChallenging=round(avg_challenging, 1),
+                    avgFeedback=round(avg_feedback, 1),
+                    # ... other aggregated fields if needed ...
+                )
+
+
+@api_view(['POST'])
+def save_exercise_instance_stats(request):
+    data = request.data
+    data['timestamp'] = timezone.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    try:
+        # Validate data (ensure all required fields are present)
+        serializer = AnalyticalSerializer(data=data)  
+        if serializer.is_valid():
+            # Save to AnalyticalTable
+            instance_stats = serializer.save() # the timestamp is in data now
+            # Call the aggregation update function
+            update_aggregated_stats(instance_stats.uID, instance_stats.eID) 
+
+            return Response({"message": "Statistics saved successfully."}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+

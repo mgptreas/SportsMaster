@@ -40,3 +40,9 @@ curl -X GET "http://127.0.0.1:8000/api/get_sport_fields/?sport_name=Sport%20A"
 
 curl -X GET "http://127.0.0.1:8000/api/get_exercise_info?eID=253"
 
+
+curl -X GET "http://127.0.0.1:8000/api/get_exercise_stats/?uID=22&eID=253"
+
+
+curl -X POST -H "Content-Type: application/json" -d '{"uID": 22, "eID": 253, "TOC": 10, "challenging": 7, "feedback": 8}' "http://127.0.0.1:8000/api/save_exercise_instance_stats/"
+

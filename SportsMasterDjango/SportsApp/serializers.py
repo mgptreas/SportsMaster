@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Users, UserAuth, Unlocked, Sports, Exercises
+from .models import Users, UserAuth, Unlocked, Sports, Exercises, Analytical
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,4 +29,12 @@ class SportsSerializer(serializers.ModelSerializer):
 class ExercisesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Exercises
-        fields = ['eID','sID', 'name', 'description', 'TOC', 'video', 'difficulty', 'field1', 'field2', 'field3', 'field4', 'field5'] 
+        fields = ['eID','sID', 'name', 'description', 'TOC', 'video', 'difficulty', 'field1', 'field2', 'field3', 'field4', 'field5']
+
+class AnalyticalSerializer(serializers.ModelSerializer):
+    uID = serializers.PrimaryKeyRelatedField(queryset=Users.objects.all())
+    eID = serializers.PrimaryKeyRelatedField(queryset=Exercises.objects.all())
+
+    class Meta:
+        model = Analytical
+        fields = ['uID', 'eID', 'toc', 'challenging', 'feedback', 'timestamp']  # Include 'timestamp' 
