@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Map;
+
 public class Exercise implements Parcelable {
     @SerializedName("eID") // Map to the "eID" field in JSON
     private int eID;
@@ -47,6 +49,8 @@ public class Exercise implements Parcelable {
 
     @SerializedName("TOC")
     private double TOC;
+
+    private Map<String, Integer> fields;
 
 
     // Constructor
@@ -199,6 +203,14 @@ public class Exercise implements Parcelable {
     // Setter for TOC
     public void setTOC(double TOC) {
         this.TOC = TOC;
+    }
+
+    public Map<String, Integer> getFields() {
+        return fields;
+    }
+
+    public void setFields(Map<String, Integer> fields) {
+        this.fields = fields;
     }
 
     // Parcelable methods

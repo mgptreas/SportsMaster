@@ -94,6 +94,7 @@ public class UnlockedExercisesActivity extends AppCompatActivity {
     private void onExerciseClick(Exercise exercise) {
         Intent intent = new Intent(UnlockedExercisesActivity.this, ExerciseInfoActivity.class);
         intent.putExtra("exercise", exercise);
+        intent.putExtra("isUnlocked", exercise.getIsUnlocked());
         startActivity(intent);
     }
 }

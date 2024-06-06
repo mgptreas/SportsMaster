@@ -11,6 +11,11 @@ import android.widget.Button;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,9 +39,33 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         tvExerciseTOC = findViewById(R.id.tv_exercise_toc);
         btnUnlock = findViewById(R.id.btn_unlock);
 
-        // Fetch exercise info
+        // Fetch exercise info from intent
         Exercise exercise = getIntent().getParcelableExtra("exercise");
-        displayExerciseInfo(exercise);
+        boolean isUnlocked = getIntent().getBooleanExtra("isUnlocked", false);
+        exercise.setIsUnlocked(isUnlocked);
+
+        // Call the API to get full exercise details
+        ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
+        Call<Exercise> call = apiService.getExerciseInfo(exercise.getEID());
+
+        call.enqueue(new Callback<Exercise>() {
+            @Override
+            public void onResponse(Call<Exercise> call, Response<Exercise> response) {
+                if (response.isSuccessful()) {
+                    Exercise detailedExercise = response.body();
+                    detailedExercise.setIsUnlocked(isUnlocked); // Ensure isUnlocked is set correctly
+                    displayExerciseInfo(detailedExercise);
+                } else {
+                    Toast.makeText(ExerciseInfoActivity.this, "Failed to load exercise details.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Exercise> call, Throwable t) {
+                Toast.makeText(ExerciseInfoActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                Log.e("ExerciseInfoActivity", "Network Error: " + t.getMessage());
+            }
+        });
 
         SessionManager sessionManager = SessionManager.getInstance(this);
         User user = sessionManager.getUser(); // Fetch the user's information from the session
@@ -45,10 +74,11 @@ public class ExerciseInfoActivity extends AppCompatActivity {
             // Check if the user object is not null and has more than 5 coins
             if (user != null && user.getPoints() >= 5) {
                 // Call the API to unlock the exercise
-                ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
-                Call<Void> call = apiService.unlockExercise(user.getUID(), exercise.getEID());
+                ApiService apiServiceUnlock = ApiClient.getRetrofitInstance().create(ApiService.class);
+                UnlockRequest unlockRequest = new UnlockRequest(user.getUID(), exercise.getEID());
+                Call<Void> callUnlock = apiServiceUnlock.unlockExercise(unlockRequest);
 
-                call.enqueue(new Callback<Void>() {
+                callUnlock.enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.isSuccessful()) {
@@ -83,6 +113,8 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         tvExerciseName.setText(exercise.getName());
         tvExerciseDescription.setText(exercise.getDescription());
 
+        Log.d("ExerciseInfoActivity", "Is Unlocked: " + exercise.getIsUnlocked());
+
         if (exercise.getIsUnlocked()) {
             String videoUrl = exercise.getVideo();
             Uri uri = Uri.parse(videoUrl);
@@ -100,7 +132,6 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         tvExerciseDifficulty.setText("Difficulty: " + exercise.getDifficulty());
         tvExerciseTOC.setText("TOC: " + exercise.getTOC());
 
-        // Display the fields
         displayFields(exercise);
     }
 
@@ -111,10 +142,27 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         TextView tvField4 = findViewById(R.id.tv_field4);
         TextView tvField5 = findViewById(R.id.tv_field5);
 
-        tvField1.setText("Field1: " + exercise.getField1());
-        tvField2.setText("Field2: " + exercise.getField2());
-        tvField3.setText("Field3: " + exercise.getField3());
-        tvField4.setText("Field4: " + exercise.getField4());
-        tvField5.setText("Field5: " + exercise.getField5());
+        Map<String, Integer> fields = exercise.getFields();
+
+        if (fields != null) {
+            List<String> fieldNames = new ArrayList<>(fields.keySet());
+            List<Integer> fieldValues = new ArrayList<>(fields.values());
+
+            if (fieldNames.size() > 0) {
+                tvField1.setText(fieldNames.get(0) + ": " + fieldValues.get(0));
+            }
+            if (fieldNames.size() > 1) {
+                tvField2.setText(fieldNames.get(1) + ": " + fieldValues.get(1));
+            }
+            if (fieldNames.size() > 2) {
+                tvField3.setText(fieldNames.get(2) + ": " + fieldValues.get(2));
+            }
+            if (fieldNames.size() > 3) {
+                tvField4.setText(fieldNames.get(3) + ": " + fieldValues.get(3));
+            }
+            if (fieldNames.size() > 4) {
+                tvField5.setText(fieldNames.get(4) + ": " + fieldValues.get(4));
+            }
+        }
     }
 }

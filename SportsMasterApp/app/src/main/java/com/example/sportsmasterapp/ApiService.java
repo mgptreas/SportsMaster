@@ -42,10 +42,6 @@ public interface ApiService {
     @GET("/api/get_exercise_info/")
     Call<Exercise> getExerciseInfo(@Query("eID") int exerciseId);
 
-    @FormUrlEncoded
-    @POST("unlock_exercise/")
-    Call<Void> unlockExercise(
-            @Query("uID") int userId,
-            @Query("eID") int exerciseId
-    );
+    @POST("/api/unlock_exercise/")
+    Call<Void> unlockExercise(@Body UnlockRequest unlockRequest);
 }

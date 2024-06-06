@@ -370,38 +370,30 @@ def get_exercises_with_sport(request):
 @api_view(['GET'])
 def get_exercise_info(request):
     exercise_id = request.query_params.get('eID')
-    
+
     if not exercise_id:
-        return Response({"error": "exercise_id is a required parameter."}, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response({"error": "eID is a required parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
-        exercise = Exercises.objects.get(eID=exercise_id)
-         
-        sport = exercise.sID  # Assuming sID is the foreign key to Sport
-        fields = [getattr(sport, f'field{i+1}') for i in range(5)]  # Retrieve field names from Sport
-
-        # Retrieve field values from Exercise
-        field_values = [
-            getattr(exercise, f'field{i+1}') for i in range(5)
-        ]
-
-        # Create a dictionary mapping field names to field values
-        field_data = {field_name: field_value for field_name, field_value in zip(fields, field_values)}
-        
-        response_data = {
-            'eID': exercise.eID,
-            'name': exercise.name,
-            'description': exercise.description,
-            'video': exercise.video,
-            'difficulty': exercise.difficulty,
-            'TOC': exercise.TOC,
-            'fields': field_data
-        }
-        
-        return Response(response_data, status=status.HTTP_200_OK)
-    
+        exercise = Exercises.objects.select_related('sID').get(eID=exercise_id)
+        sport = exercise.sID
     except Exercises.DoesNotExist:
         return Response({"error": "Exercise not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    # Serialize the exercise data
+    serialized_exercise = ExercisesSerializer(exercise).data
+
+    # Add sport field names and their corresponding values
+    fields = {
+        sport.field1: exercise.field1,
+        sport.field2: exercise.field2,
+        sport.field3: exercise.field3,
+        sport.field4: exercise.field4,
+        sport.field5: exercise.field5,
+    }
+    serialized_exercise['fields'] = fields
+
+    return Response(serialized_exercise)
     
 
 ######################################## UNLOCK EXERCISE ############################################################################################
@@ -414,7 +406,7 @@ def unlock_exercise(request):
         return Response({"error": "Both userID and exerciseID are required parameters."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        user = Users.objects.get(id=user_id)
+        user = Users.objects.get(uID=user_id)
     except Users.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -428,7 +420,7 @@ def unlock_exercise(request):
         user.save()
 
         # Add entry to the Unlocked table to indicate that the exercise is unlocked for the user
-        Unlocked.objects.create(user_id=user_id, exercise_id=exercise_id)
+        Unlocked.objects.create(uID=user, eID=Exercises.objects.get(eID=exercise_id))
 
         return Response({"message": "Exercise unlocked successfully."}, status=status.HTTP_200_OK)
 
