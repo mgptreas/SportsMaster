@@ -66,9 +66,8 @@ public class FieldSelectActivity extends AppCompatActivity {
         fieldCheckboxes = new ArrayList<>();
 
         // Retrieve sport name from Intent
-        //For development hardcode Sport A
-        //selectedSport = getIntent().getStringExtra("sport_name");
-        selectedSport = "Sport A";
+        selectedSport = getIntent().getStringExtra("sport_name");
+
 
         // Set up NumberPickers for time selection
         npHours.setMinValue(0);

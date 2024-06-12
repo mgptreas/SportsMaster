@@ -1,12 +1,11 @@
 package com.example.sportsmasterapp;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 import android.widget.Button;
 import android.view.View;
 
@@ -15,17 +14,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
+import com.google.android.exoplayer2.util.Util;
+
 public class ExerciseInfoActivity extends AppCompatActivity {
 
     private TextView tvExerciseName, tvExerciseDescription, tvExerciseDifficulty, tvExerciseTOC;
-    private VideoView exerciseVideo;
     private Button btnUnlock;
+    private StyledPlayerView playerView;
+    private ExoPlayer exoPlayer;
 
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +44,7 @@ public class ExerciseInfoActivity extends AppCompatActivity {
         // Initialize views
         tvExerciseName = findViewById(R.id.tv_exercise_name);
         tvExerciseDescription = findViewById(R.id.tv_exercise_description);
-        exerciseVideo = findViewById(R.id.video_view);
+        playerView = findViewById(R.id.video_view);
         tvExerciseDifficulty = findViewById(R.id.tv_exercise_difficulty);
         tvExerciseTOC = findViewById(R.id.tv_exercise_toc);
         btnUnlock = findViewById(R.id.btn_unlock);
@@ -120,15 +130,28 @@ public class ExerciseInfoActivity extends AppCompatActivity {
 
         if (exercise.getIsUnlocked()) {
             String videoUrl = exercise.getVideo();
-            Uri uri = Uri.parse(videoUrl);
-            exerciseVideo.setVideoURI(uri);
-            exerciseVideo.start();
+            String fileId = extractGoogleDriveFileId(videoUrl);
+
+            // Test with a known working URL
+            String directDownloadUrl = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4"; // Known working URL
+
+            if (fileId != null) {
+                directDownloadUrl = "https://drive.google.com/uc?export=download&id=" + fileId;
+            }
+
+            Log.d("ExerciseInfoActivity", "Playing video from URL: " + directDownloadUrl);
+
+            MediaItem mediaItem = MediaItem.fromUri(directDownloadUrl);
+            exoPlayer.setMediaItem(mediaItem);
+            exoPlayer.prepare();
+            exoPlayer.play();
+
             tvExerciseDescription.setVisibility(View.VISIBLE);
-            exerciseVideo.setVisibility(View.VISIBLE);
+            playerView.setVisibility(View.VISIBLE);
             btnUnlock.setVisibility(View.GONE);
         } else {
             tvExerciseDescription.setVisibility(View.GONE);
-            exerciseVideo.setVisibility(View.GONE);
+            playerView.setVisibility(View.GONE);
             btnUnlock.setVisibility(View.VISIBLE);
         }
 
@@ -166,6 +189,81 @@ public class ExerciseInfoActivity extends AppCompatActivity {
             if (fieldNames.size() > 4) {
                 tvField5.setText(fieldNames.get(4) + ": " + fieldValues.get(4));
             }
+        }
+    }
+
+    private String extractGoogleDriveFileId(String url) {
+        String pattern = "https://drive.google.com/file/d/(.*?)/view.*?";
+        Pattern regex = Pattern.compile(pattern);
+        Matcher matcher = regex.matcher(url);
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Util.SDK_INT <= 23 || exoPlayer == null) {
+            initializePlayer();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
+    private void initializePlayer() {
+        if (exoPlayer == null) {
+            exoPlayer = new ExoPlayer.Builder(this).build();
+            playerView.setPlayer(exoPlayer);
+
+            // Adding debug listeners
+            exoPlayer.addListener(new Player.Listener() {
+                @Override
+                public void onPlayerError(PlaybackException error) {
+                    Log.e("ExoPlayer Error", "Player error: " + error.getMessage());
+                }
+
+                @Override
+                public void onPlaybackStateChanged(int state) {
+                    switch (state) {
+                        case Player.STATE_BUFFERING:
+                            Log.d("ExoPlayer", "Buffering");
+                            break;
+                        case Player.STATE_READY:
+                            Log.d("ExoPlayer", "Ready to play");
+                            break;
+                        case Player.STATE_ENDED:
+                            Log.d("ExoPlayer", "Playback ended");
+                            break;
+                        case Player.STATE_IDLE:
+                            Log.d("ExoPlayer", "Idle");
+                            break;
+                    }
+                }
+            });
+        }
+    }
+
+    private void releasePlayer() {
+        if (exoPlayer != null) {
+            exoPlayer.release();
+            exoPlayer = null;
         }
     }
 }
